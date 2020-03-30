@@ -10,7 +10,7 @@ using TodoList.Model.Context;
 
 namespace TodoList.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -24,7 +24,7 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Login
         /// </summary>  
-        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)] 
         public ActionResult Login()
@@ -52,5 +52,7 @@ namespace TodoList.Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }         
         }
+
+    
     }
 }
