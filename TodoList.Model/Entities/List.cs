@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Model.Entities
 {
+    [Table("list")]
     public class List:BaseEntity
     {
         [Column("id")]
@@ -30,5 +31,8 @@ namespace TodoList.Model.Entities
         public int Type { get; set; }
 
         public ListType ListType { get; set; }
+
+        [Column("priority")]
+        public byte? Priority { get; set; }
     }
 }

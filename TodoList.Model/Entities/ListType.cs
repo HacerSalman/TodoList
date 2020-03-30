@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace TodoList.Model.Entities
 {
+    [Table("list_type")]
     public class ListType:BaseEntity
     {
         [Column("id")]
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         [Column("name")]
         [Required, StringLength(200)]

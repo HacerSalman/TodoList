@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace TodoList.Model.Entities
 {
+    [Table("user")]
     public class User:BaseEntity
     {
         [Column("id")]

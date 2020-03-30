@@ -23,9 +23,6 @@ namespace TodoList.Model.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            //using for insert auto increment value
-
             #region User       
             modelBuilder.Entity<User>()
      .Property(u => u.Id).ValueGeneratedOnAdd();
