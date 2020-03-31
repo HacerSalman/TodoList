@@ -53,6 +53,31 @@ namespace TodoList.Api.Controllers
             }         
         }
 
-    
+        [HttpPost]
+        /// <summary>
+        /// sign up
+        /// </summary>  
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public ActionResult SignUp()
+        {
+            return Ok();
+        }
+
+        [HttpPost]
+        /// <summary>
+        /// Delete user account
+        /// </summary>  
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public ActionResult DeleteAccount()
+        {
+            return Ok();
+        }
+
     }
 }
