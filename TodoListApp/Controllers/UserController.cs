@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Api.Internal;
@@ -26,7 +27,8 @@ namespace TodoList.Api.Controllers
         /// </summary>  
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(500)] 
+        [ProducesResponseType(500)]
+        [AllowAnonymous]
         public ActionResult Login()
         {
             try
@@ -60,6 +62,7 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
+        [AllowAnonymous]
         public ActionResult SignUp()
         {
             return Ok();
