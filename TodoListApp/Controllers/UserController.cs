@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Api.Internal;
 using TodoList.Model.Context;
+using TodoList.Model.Entities;
+using TodoList.Model.RequestModels;
 
 namespace TodoList.Api.Controllers
 {
@@ -59,13 +61,35 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// sign up
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(User),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [AllowAnonymous]
-        public ActionResult SignUp()
-        {
-            return Ok();
+        public ActionResult SignUp(SignUpRequest signUpUser)
+        {            
+            try
+            {
+                var newUser = new User()
+                {
+                    CreatedDate = Utils.GetUnixTimeNow(),
+                    FullName = signUpUser.UserName,
+                    ModifierBy = signUpUser.UserName,
+                    OwnerBy = signUpUser.FullName,
+                    Password = Utils.EncodePassword(signUpUser.Password),
+                    Status = 1,
+                    UpdatedDate = Utils.GetUnixTimeNow(),
+                    UserName = signUpUser.UserName
+                };
+
+                db.User.Add(newUser);
+                db.SaveChanges();
+                return Ok(newUser);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+          
         }
 
         [HttpPost]

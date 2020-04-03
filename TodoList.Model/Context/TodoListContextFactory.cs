@@ -13,9 +13,8 @@ namespace TodoList.Model.Context
     {
         public TodoListDBContext CreateDbContext(string[] args)
         {
-            var connectionString = "Your connection string";
             var optionsBuilder = new DbContextOptionsBuilder<TodoListDBContext>();
-            optionsBuilder.UseMySql(connectionString);
+            optionsBuilder.UseMySql(Environment.GetEnvironmentVariable("TODOLIST_DB_CONNECTION"));
             optionsBuilder.EnableSensitiveDataLogging();
 
             return new TodoListDBContext(optionsBuilder.Options);
