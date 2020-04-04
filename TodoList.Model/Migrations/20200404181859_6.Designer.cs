@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoList.Model.Context;
 
 namespace TodoList.Model.Migrations
 {
     [DbContext(typeof(TodoListDBContext))]
-    partial class TodoListDBContextModelSnapshot : ModelSnapshot
+    [Migration("20200404181859_6")]
+    partial class _6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,76 +196,11 @@ namespace TodoList.Model.Migrations
                     b.ToTable("user");
                 });
 
-            modelBuilder.Entity("TodoList.Model.Entities.UserList", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("CreatedDate")
-                        .HasColumnName("created_date")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("ListId")
-                        .HasColumnName("list_id")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ModifierBy")
-                        .HasColumnName("modifier_by")
-                        .HasColumnType("varchar(80) CHARACTER SET utf8mb4")
-                        .HasMaxLength(80);
-
-                    b.Property<string>("OwnerBy")
-                        .HasColumnName("owner_by")
-                        .HasColumnType("varchar(80) CHARACTER SET utf8mb4")
-                        .HasMaxLength(80);
-
-                    b.Property<byte?>("Status")
-                        .HasColumnName("status")
-                        .HasColumnType("tinyint unsigned");
-
-                    b.Property<long>("UpdatedDate")
-                        .HasColumnName("updated_date")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UserId")
-                        .HasColumnName("user_id")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedDate");
-
-                    b.HasIndex("ListId");
-
-                    b.HasIndex("UpdatedDate");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("user_list");
-                });
-
             modelBuilder.Entity("TodoList.Model.Entities.List", b =>
                 {
                     b.HasOne("TodoList.Model.Entities.ListType", "ListType")
                         .WithMany()
                         .HasForeignKey("Type")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("TodoList.Model.Entities.UserList", b =>
-                {
-                    b.HasOne("TodoList.Model.Entities.List", "List")
-                        .WithMany()
-                        .HasForeignKey("ListId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("TodoList.Model.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

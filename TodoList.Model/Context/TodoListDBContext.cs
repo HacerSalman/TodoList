@@ -44,10 +44,22 @@ namespace TodoList.Model.Context
             #region ListType
             modelBuilder.Entity<ListType>()
   .Property(u => u.Id).ValueGeneratedOnAdd();
-            modelBuilder.Entity<ListType>().HasIndex(u => u.Name).IsUnique();
             modelBuilder.Entity<ListType>().HasIndex(u => u.CreatedDate);
             modelBuilder.Entity<ListType>().HasIndex(u => u.UpdatedDate);
-            #endregion          
+            #endregion
+
+            #region UserList
+            modelBuilder.Entity<UserList>()
+.Property(u => u.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<UserList>().HasOne(u => u.User).WithMany()
+          .HasForeignKey(u => u.UserId)
+           .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserList>().HasOne(u => u.List).WithMany()
+         .HasForeignKey(u => u.ListId)
+          .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserList>().HasIndex(u => u.CreatedDate);
+            modelBuilder.Entity<UserList>().HasIndex(u => u.UpdatedDate);
+            #endregion
 
         }
 

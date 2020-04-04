@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Model.Context;
+using TodoList.Model.Entities;
 
 namespace TodoList.Api.Controllers
 {
@@ -27,7 +28,7 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult AddList(long userId)
+        public ActionResult AddList(long userId,[FromBody] List list)
         {
             return Ok();
         }
