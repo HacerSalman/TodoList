@@ -94,7 +94,7 @@ namespace TodoList.Api.Controllers
         /// <summary>
         ///Update the list
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(List),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
@@ -129,6 +129,8 @@ namespace TodoList.Api.Controllers
                     currentList.Title = !string.IsNullOrEmpty(list.Title) ? list.Title : currentList.Title;
                     currentList.Type = list.Type != null ? list.Type : currentList.Type;
                     db.SaveChanges();
+
+                    return Ok(currentList);
                 }
                 else
                     return Unauthorized("Unauthorized!");
@@ -136,8 +138,7 @@ namespace TodoList.Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
-            }
-            return Ok();
+            }         
 
         }
 
@@ -150,7 +151,7 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult AddMultipleList([FromQuery] long[] listId)
+        public ActionResult AddMultipleList([FromBody] List[] listArray)
         {
             return Ok();
         }
