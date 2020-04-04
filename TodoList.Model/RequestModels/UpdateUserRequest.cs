@@ -8,8 +8,6 @@ namespace TodoList.Model.RequestModels
 {
     public class UpdateUserRequest
     {
-        [JsonPropertyName("id")]
-        public long Id { get; set; }
 
         [JsonPropertyName("full_name")]
         public string FullName { get; set; }

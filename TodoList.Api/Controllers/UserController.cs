@@ -27,19 +27,19 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Login
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(User),200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)]
-        [AllowAnonymous]
         public ActionResult Login()
         {
             try
             {
+                User user = null;
                 //Check Basic Authentication
                 Microsoft.Extensions.Primitives.StringValues authorizationToken;
                 HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken))
-                    return Ok();
+                if (Utils.CheckBasicAuth(db, authorizationToken,ref user))
+                    return Ok(user);
                 else
                     return Unauthorized("Username or password incorrect!");
             }
@@ -57,7 +57,6 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(400)]
         [ProducesResponseType(409)]
         [ProducesResponseType(500)]
-        [AllowAnonymous]
         public ActionResult SignUp([FromBody]SignUpRequest signUpUser)
         {            
             try
@@ -100,7 +99,6 @@ namespace TodoList.Api.Controllers
         }
 
         [HttpDelete]
-        [Route("user/{id}/delete")]
         /// <summary>
         /// Delete the user
         /// </summary>  
@@ -109,16 +107,16 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult DeleteUser(long id)
+        public ActionResult DeleteUser()
         {
             try
             {
+                User user = null;
                 //Check Basic Authentication
                 Microsoft.Extensions.Primitives.StringValues authorizationToken;
                 HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken))
+                if (Utils.CheckBasicAuth(db, authorizationToken,ref user))
                 {
-                    var user = db.User.Where(u => u.Id == id).FirstOrDefault();
                     if (user == null)
                     {
                         return NotFound("The user not found!");
@@ -153,6 +151,7 @@ namespace TodoList.Api.Controllers
         {
             try
             {
+                User user = null;
                 //Check request body object
                 if (request == null)
                 {
@@ -162,9 +161,8 @@ namespace TodoList.Api.Controllers
                 //Check Basic Authentication
                 Microsoft.Extensions.Primitives.StringValues authorizationToken;
                 HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken))
+                if (Utils.CheckBasicAuth(db, authorizationToken,ref user))
                 {
-                    var user = db.User.Where(u => u.Id == request.Id).FirstOrDefault();
                     if (user == null)
                     {
                         return NotFound("The user not found!");
@@ -188,7 +186,6 @@ namespace TodoList.Api.Controllers
         }
 
         [HttpGet]
-        [Route("user/{id}")]
         /// <summary>
         /// Get the user
         /// </summary>  
@@ -196,16 +193,16 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult GetUser(long id)
+        public ActionResult GetUser()
         {
             try
             {
+                User user = null;
                 //Check Basic Authentication
                 Microsoft.Extensions.Primitives.StringValues authorizationToken;
                 HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken))
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
-                    var user = db.User.Where(u => u.Id == id).FirstOrDefault();
                     if (user == null)
                     {
                         return NotFound("The user not found!");

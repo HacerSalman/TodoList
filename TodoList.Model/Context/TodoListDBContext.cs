@@ -79,7 +79,8 @@ namespace TodoList.Model.Context
         #region DbSets
         public DbSet<User> User { get; set; }
         public DbSet<List> List { get; set; }
-        public DbSet<ListType> ListType { get; set; }       
+        public DbSet<ListType> ListType { get; set; }
+        public DbSet<UserList> UserList { get; set; }
         #endregion DbSets   
     }
 }

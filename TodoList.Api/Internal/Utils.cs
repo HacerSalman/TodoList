@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TodoList.Model.Context;
+using TodoList.Model.Entities;
 
 namespace TodoList.Api.Internal
 {
@@ -38,7 +39,7 @@ namespace TodoList.Api.Internal
             return dtDateTime;
         }
 
-        public static bool CheckBasicAuth(TodoListDBContext db,StringValues authorizationToken)
+        public static bool CheckBasicAuth(TodoListDBContext db,StringValues authorizationToken, ref User user_ref)
         {
             if (!String.IsNullOrEmpty(authorizationToken.ToString()))
             {
@@ -49,7 +50,11 @@ namespace TodoList.Api.Internal
                 if (user == null)
                     return false;
                 else
+                {
+                    user_ref = user;
                     return true;
+                }
+                   
             }
             return false;
         }
