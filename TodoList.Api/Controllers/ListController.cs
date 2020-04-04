@@ -215,14 +215,46 @@ namespace TodoList.Api.Controllers
         /// <summary>
         ///Add list type to the list
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(List),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public ActionResult AddTypeToList(long listId,int typeId)
         {
-            return Ok();
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    //Check user list
+                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == listId);
+                    if (userList == null)
+                        return Unauthorized("Unauthorized!");
+
+                    //Check the list
+                    var currentList = db.List.Where(l => l.Id == listId).FirstOrDefault();
+                    if (currentList == null)
+                        return NotFound("The list not found!");
+
+                    currentList.ModifierBy = user.UserName;
+                    currentList.UpdatedDate = Utils.GetUnixTimeNow();
+                    currentList.Type = typeId;
+
+                    db.SaveChanges();
+
+                    return Ok(currentList);
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
 
@@ -237,7 +269,38 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(500)]
         public ActionResult DeleteList(long listId)
         {
-            return Ok();
+
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    //Check user list
+                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == listId);
+                    if (userList == null)
+                        return Unauthorized("Unauthorized!");
+
+                    //Check the list
+                    var currentList = db.List.Where(l => l.Id == listId).FirstOrDefault();
+                    if (currentList == null)
+                        return NotFound("The list not found!");
+
+                    db.List.Remove(currentList);
+
+                    db.SaveChanges();
+
+                    return Ok("The list deleted!");
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
 
         }
 
@@ -252,7 +315,24 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(500)]
         public ActionResult GetUserList()
         {
-            return Ok();
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    return Ok(ListService.GetUserList(db, user.Id));
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
 
         }
     }
