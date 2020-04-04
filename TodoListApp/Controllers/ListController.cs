@@ -41,7 +41,7 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult ModifyList(long listId)
+        public ActionResult UpdateList(long listId)
         {
             return Ok();
 
@@ -73,6 +73,21 @@ namespace TodoList.Api.Controllers
         public ActionResult AddListType(long listId,int typeId)
         {
             return Ok();
+        }
+
+        [HttpPut]
+        /// <summary>
+        ///Delete the list
+        /// </summary>  
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public ActionResult DeleteList(long listId)
+        {
+            return Ok();
+
         }
 
     }

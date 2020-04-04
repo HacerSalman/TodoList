@@ -26,6 +26,7 @@ namespace TodoList.Model.Context
             #region User       
             modelBuilder.Entity<User>()
      .Property(u => u.Id).ValueGeneratedOnAdd();
+            modelBuilder.Entity<User>().HasIndex(u => u.UserName).IsUnique();
             modelBuilder.Entity<User>().HasIndex(u => u.CreatedDate);
             modelBuilder.Entity<User>().HasIndex(u => u.UpdatedDate);
             #endregion

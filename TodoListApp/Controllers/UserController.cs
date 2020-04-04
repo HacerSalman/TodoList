@@ -59,13 +59,13 @@ namespace TodoList.Api.Controllers
 
         [HttpPost]
         /// <summary>
-        /// sign up
+        /// Sign up
         /// </summary>  
         [ProducesResponseType(typeof(User),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
         [AllowAnonymous]
-        public ActionResult SignUp(SignUpRequest signUpUser)
+        public ActionResult SignUp([FromBody]SignUpRequest signUpUser)
         {            
             try
             {
@@ -92,16 +92,30 @@ namespace TodoList.Api.Controllers
           
         }
 
-        [HttpPost]
+        [HttpDelete]
         /// <summary>
-        /// Delete user account
+        /// Delete the user
         /// </summary>  
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult DeleteAccount()
+        public ActionResult DeleteUser()
+        {
+            return Ok();
+        }
+
+        [HttpPut]
+        /// <summary>
+        /// Update the user
+        /// </summary>  
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public ActionResult UpdateUser()
         {
             return Ok();
         }
