@@ -99,8 +99,44 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult UpdateList(long listId)
+        public ActionResult UpdateList([FromBody] List list)
         {
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    //Check user list
+                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == list.Id);
+                    if(userList == null)
+                        return Unauthorized("Unauthorized!");
+
+                    //Check the list
+                    var currentList = db.List.Where(l => l.Id == list.Id).FirstOrDefault();
+                    if (currentList == null)
+                        return NotFound("The list not found!");
+
+                    currentList.ModifierBy = user.UserName;
+                    currentList.UpdatedDate = Utils.GetUnixTimeNow();
+                    currentList.Description = !string.IsNullOrEmpty(list.Description) ? list.Description : currentList.Description;
+                    currentList.EndsAt = list.EndsAt != null ? list.EndsAt : currentList.EndsAt;
+                    currentList.Priority = list.Priority != null ? list.Priority : currentList.Priority;
+                    currentList.StartsAt = list.StartsAt != null ? list.StartsAt : currentList.StartsAt;
+                    currentList.Status = list.Status != null ? list.Status : currentList.Status;
+                    currentList.Title = !string.IsNullOrEmpty(list.Title) ? list.Title : currentList.Title;
+                    currentList.Type = list.Type != null ? list.Type : currentList.Type;
+                    db.SaveChanges();
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
             return Ok();
 
         }
