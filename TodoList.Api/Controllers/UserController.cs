@@ -55,6 +55,7 @@ namespace TodoList.Api.Controllers
         /// </summary>  
         [ProducesResponseType(typeof(User),200)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(409)]
         [ProducesResponseType(500)]
         [AllowAnonymous]
         public ActionResult SignUp([FromBody]SignUpRequest signUpUser)
@@ -152,6 +153,12 @@ namespace TodoList.Api.Controllers
         {
             try
             {
+                //Check request body object
+                if (request == null)
+                {
+                    return BadRequest("Request bosy can not be empty!");
+                }
+
                 //Check Basic Authentication
                 Microsoft.Extensions.Primitives.StringValues authorizationToken;
                 HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
@@ -185,14 +192,35 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Get the user
         /// </summary>  
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
+        [ProducesResponseType(typeof(User),200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public ActionResult GetUser(long id)
         {
-            return Ok();
+            try
+            {
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken))
+                {
+                    var user = db.User.Where(u => u.Id == id).FirstOrDefault();
+                    if (user == null)
+                    {
+                        return NotFound("The user not found!");
+                    }
+
+                    return Ok(user);
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+           
         }
 
     }
