@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TodoList.Api.Internal;
+using TodoList.Api.ServiceRepository;
 using TodoList.Model.Context;
 using TodoList.Model.Entities;
+using TodoList.Model.ResponseModels;
 
 namespace TodoList.Api.Controllers
 {
@@ -146,14 +148,67 @@ namespace TodoList.Api.Controllers
         /// <summary>
         ///Add multiple list
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(UserListResponse),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public ActionResult AddMultipleList([FromBody] List[] listArray)
         {
-            return Ok();
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    foreach (var list in listArray)
+                    {
+                        //Create list
+                        var newList = new List()
+                        {
+                            CreatedDate = Utils.GetUnixTimeNow(),
+                            Description = list.Description,
+                            EndsAt = list.EndsAt,
+                            ModifierBy = user.UserName,
+                            OwnerBy = user.UserName,
+                            Priority = list.Priority,
+                            StartsAt = list.StartsAt,
+                            Status = 1,
+                            Title = list.Title,
+                            Type = list.Type,
+                            UpdatedDate = Utils.GetUnixTimeNow()
+                        };
+                        db.List.Add(newList);
+                        db.SaveChanges();
+
+                        //Create user list
+                        var userList = new UserList()
+                        {
+                            ListId = newList.Id,
+                            ModifierBy = user.UserName,
+                            OwnerBy = user.OwnerBy,
+                            Status = 1,
+                            UpdatedDate = Utils.GetUnixTimeNow(),
+                            CreatedDate = Utils.GetUnixTimeNow(),
+                            UserId = user.Id
+                        };
+                        db.UserList.Add(userList);
+                        db.SaveChanges();
+
+                    }
+
+                    UserListResponse response = ListService.GetUserList(db, user.Id);
+                    return Ok(response);
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
 
         [HttpPut]
@@ -165,12 +220,13 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
-        public ActionResult AddListType(long listId,int typeId)
+        public ActionResult AddTypeToList(long listId,int typeId)
         {
             return Ok();
         }
 
-        [HttpPut]
+
+        [HttpDelete]
         /// <summary>
         ///Delete the list
         /// </summary>  
@@ -185,5 +241,19 @@ namespace TodoList.Api.Controllers
 
         }
 
+        [HttpGet]
+        /// <summary>
+        ///Get user list
+        /// </summary>  
+        [ProducesResponseType(typeof(UserListResponse),200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(500)]
+        public ActionResult GetUserList()
+        {
+            return Ok();
+
+        }
     }
 }
