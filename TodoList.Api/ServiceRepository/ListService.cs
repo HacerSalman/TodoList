@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TodoList.Model.Context;
+using TodoList.Model.Entities;
 using TodoList.Model.ResponseModels;
 
 namespace TodoList.Api.ServiceRepository
@@ -11,12 +12,15 @@ namespace TodoList.Api.ServiceRepository
     {
         public static UserListResponse GetUserList(TodoListDBContext db, long userId)
         {
-            UserListResponse response = null;
-            var userIdList = db.UserList.Where(ul => ul.UserId == userId).Select( ul => ul.UserId).ToList();
-            if(userIdList != null && userIdList.Count >0)
-            {
-                response.List = db.List.Where(l => userIdList.Contains(l.Id)).ToList();
-            }
+            UserListResponse response = null;         
+
+            var list = from ul in db.UserList
+                    join l in db.List
+                    on ul.ListId equals l.Id
+                    where ul.UserId == userId
+                    select l;
+
+            response.List = list.ToList();
             response.UserId = userId;
 
             return response;
