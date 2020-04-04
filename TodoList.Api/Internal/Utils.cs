@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using TodoList.Model.Context;
 
 namespace TodoList.Api.Internal
 {
@@ -33,6 +36,22 @@ namespace TodoList.Api.Internal
             DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
             dtDateTime = dtDateTime.AddSeconds(unixTime).ToLocalTime();
             return dtDateTime;
+        }
+
+        public static bool CheckBasicAuth(TodoListDBContext db,StringValues authorizationToken)
+        {
+            if (!String.IsNullOrEmpty(authorizationToken.ToString()))
+            {
+                string[] decodedCredentials = Encoding.ASCII.GetString(Convert.FromBase64String(authorizationToken.ToString().Replace("Basic ", ""))).Split(new[] { ':' });
+
+                var encodePassword = EncodePassword(decodedCredentials[1]);
+                var user = db.User.Where(u => u.UserName == decodedCredentials[0] && u.Password == encodePassword).FirstOrDefault();
+                if (user == null)
+                    return false;
+                else
+                    return true;
+            }
+            return false;
         }
     }
 }

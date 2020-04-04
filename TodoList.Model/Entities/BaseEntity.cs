@@ -15,8 +15,6 @@ namespace TodoList.Model.Entities
         [Column("updated_date")]
         public long UpdatedDate { get; set; }
 
-        [Column("deleted_date")]
-        public long? DeletedDate { get; set; }
 
         [Column("owner_by")]
         [StringLength(80)]
