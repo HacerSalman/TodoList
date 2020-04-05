@@ -150,12 +150,12 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userListType = db.UserListType.Where(ul => ul.UserId == user.Id && ul.ListTypeId == listType.Id).FirstOrDefault();
+                    var userListType = db.UserListType.FirstOrDefault(ul => ul.UserId == user.Id && ul.ListTypeId == listType.Id);
                     if (userListType == null)
                         return Unauthorized("Unauthorized!");
 
                     //Check the list
-                    var currentListType = db.ListType.Where(l => l.Id == listType.Id).FirstOrDefault();
+                    var currentListType = db.ListType.Find(listType.Id);
                     if (currentListType == null)
                         return NotFound("The list not found!");
 
@@ -196,7 +196,7 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userListType = db.UserListType.Where(ul => ul.UserId == user.Id && ul.ListTypeId == typeId).FirstOrDefault();
+                    var userListType = db.UserListType.FirstOrDefault(ul => ul.UserId == user.Id && ul.ListTypeId == typeId);
                     if (userListType == null)
                         return Unauthorized("Unauthorized!");
 
@@ -206,7 +206,7 @@ namespace TodoList.Api.Controllers
                     userListType.ModifierBy = user.UserName;
 
                     //Check the list
-                    var currentListType = db.ListType.Where(l => l.Id == typeId).FirstOrDefault();
+                    var currentListType = db.ListType.Find(typeId);
                     if (currentListType == null)
                         return NotFound("The list type not found!");
 

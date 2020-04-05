@@ -112,12 +112,12 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == list.Id).FirstOrDefault();
+                    var userList = db.UserList.FirstOrDefault(ul => ul.UserId == user.Id && ul.ListId == list.Id);
                     if(userList == null)
                         return Unauthorized("Unauthorized!");
 
                     //Check the list
-                    var currentList = db.List.Where(l => l.Id == list.Id).FirstOrDefault();
+                    var currentList = db.List.Find(list.Id);
                     if (currentList == null)
                         return NotFound("The list not found!");
 
@@ -230,12 +230,12 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == listId);
+                    var userList = db.UserList.FirstOrDefault(ul => ul.UserId == user.Id && ul.ListId == listId);
                     if (userList == null)
                         return Unauthorized("Unauthorized!");
 
                     //Check the list
-                    var currentList = db.List.Where(l => l.Id == listId).FirstOrDefault();
+                    var currentList = db.List.FirstOrDefault(l => l.Id == listId);
                     if (currentList == null)
                         return NotFound("The list not found!");
 
@@ -278,7 +278,7 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == listId).FirstOrDefault();
+                    var userList = db.UserList.FirstOrDefault(ul => ul.UserId == user.Id && ul.ListId == listId);
                     if (userList == null)
                         return Unauthorized("Unauthorized!");
 
@@ -288,7 +288,7 @@ namespace TodoList.Api.Controllers
                     userList.ModifierBy = user.UserName;
 
                     //Check the list
-                    var currentList = db.List.Where(l => l.Id == listId).FirstOrDefault();
+                    var currentList = db.List.Find(listId);
                     if (currentList == null)
                         return NotFound("The list not found!");
 

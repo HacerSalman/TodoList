@@ -68,7 +68,7 @@ namespace TodoList.Api.Controllers
                 }
 
                 //Check username 
-                var user = db.User.Where(u => u.UserName == signUpUser.UserName.Trim()).FirstOrDefault();
+                var user = db.User.FirstOrDefault(u => u.UserName == signUpUser.UserName.Trim());
                 if(user != null)
                 {
                     if(user.Status == 1)
