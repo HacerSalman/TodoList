@@ -112,7 +112,7 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == list.Id);
+                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == list.Id).FirstOrDefault();
                     if(userList == null)
                         return Unauthorized("Unauthorized!");
 

@@ -66,5 +66,167 @@ namespace TodoList.Api.Controllers
             }
 
         }
+
+        [HttpPost]
+        /// <summary>
+        ///Add list type
+        /// </summary>  
+        [ProducesResponseType(typeof(ListType),200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        public ActionResult AddListType([FromBody] ListType listType)
+        {
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    if (user == null)
+                    {
+                        return NotFound("The user not found!");
+                    }
+                    else
+                    {
+                        //Create list type
+                        var newListType= new ListType()
+                        {
+                            CreatedDate = Utils.GetUnixTimeNow(),
+                            Description = listType.Description,                 
+                            ModifierBy = user.UserName,
+                            OwnerBy = user.UserName,
+                            Status = 1,
+                            UpdatedDate = Utils.GetUnixTimeNow(),
+                            Name = listType.Name
+                        };
+                        db.ListType.Add(newListType);
+                        db.SaveChanges();
+
+                        //Create user list type
+                        var userListType = new UserListType()
+                        {
+                            ListTypeId = newListType.Id,
+                            ModifierBy = user.UserName,
+                            OwnerBy = user.OwnerBy,
+                            Status = 1,
+                            UpdatedDate = Utils.GetUnixTimeNow(),
+                            CreatedDate = Utils.GetUnixTimeNow(),
+                            UserId = user.Id
+                        };
+                        db.UserListType.Add(userListType);
+                        db.SaveChanges();
+
+                        return Ok(newListType);
+                    }
+
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
+
+        [HttpPut]
+        /// <summary>
+        ///Update list type
+        /// </summary>  
+        [ProducesResponseType(typeof(ListType),200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        public ActionResult UpdateListType([FromBody] ListType listType)
+        {
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    //Check user list
+                    var userListType = db.UserListType.Where(ul => ul.UserId == user.Id && ul.ListTypeId == listType.Id).FirstOrDefault();
+                    if (userListType == null)
+                        return Unauthorized("Unauthorized!");
+
+                    //Check the list
+                    var currentListType = db.ListType.Where(l => l.Id == listType.Id).FirstOrDefault();
+                    if (currentListType == null)
+                        return NotFound("The list not found!");
+
+                    currentListType.ModifierBy = user.UserName;
+                    currentListType.UpdatedDate = Utils.GetUnixTimeNow();
+                    currentListType.Description = !string.IsNullOrEmpty(listType.Description) ? listType.Description : currentListType.Description;
+                    currentListType.Name = !string.IsNullOrEmpty(listType.Name) ? listType.Name : currentListType.Name;                 
+                    db.SaveChanges();
+
+                    return Ok(currentListType);
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+
+        }
+
+        [HttpDelete]
+        /// <summary>
+        ///Delete list type
+        /// </summary>  
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        public ActionResult DeleteListType(int typeId)
+        {
+            try
+            {
+                User user = null;
+                //Check Basic Authentication
+                Microsoft.Extensions.Primitives.StringValues authorizationToken;
+                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
+                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                {
+                    //Check user list
+                    var userListType = db.UserListType.Where(ul => ul.UserId == user.Id && ul.ListTypeId == typeId).FirstOrDefault();
+                    if (userListType == null)
+                        return Unauthorized("Unauthorized!");
+
+                    //Delete user list
+                    userListType.Status = 0;
+                    userListType.UpdatedDate = Utils.GetUnixTimeNow();
+                    userListType.ModifierBy = user.UserName;
+
+                    //Check the list
+                    var currentListType = db.ListType.Where(l => l.Id == typeId).FirstOrDefault();
+                    if (currentListType == null)
+                        return NotFound("The list type not found!");
+
+                    //Delete current list
+                    currentListType.Status = 0;
+                    currentListType.UpdatedDate = Utils.GetUnixTimeNow();
+                    currentListType.ModifierBy = user.UserName;
+
+                    db.SaveChanges();
+
+                    return Ok("The list type deleted!");
+                }
+                else
+                    return Unauthorized("Unauthorized!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
     }
 }
