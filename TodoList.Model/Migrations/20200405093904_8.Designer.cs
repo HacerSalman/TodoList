@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TodoList.Model.Context;
 
 namespace TodoList.Model.Migrations
 {
     [DbContext(typeof(TodoListDBContext))]
-    partial class TodoListDBContextModelSnapshot : ModelSnapshot
+    [Migration("20200405093904_8")]
+    partial class _8
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,14 +235,9 @@ namespace TodoList.Model.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedDate");
-
                     b.HasIndex("ListId");
 
-                    b.HasIndex("UpdatedDate");
-
-                    b.HasIndex("UserId", "ListId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("user_list");
                 });
@@ -259,13 +256,13 @@ namespace TodoList.Model.Migrations
                     b.HasOne("TodoList.Model.Entities.List", "List")
                         .WithMany()
                         .HasForeignKey("ListId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TodoList.Model.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

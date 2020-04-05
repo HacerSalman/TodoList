@@ -57,6 +57,7 @@ namespace TodoList.Model.Context
             modelBuilder.Entity<UserList>().HasOne(u => u.List).WithMany()
          .HasForeignKey(u => u.ListId)
           .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserList>().HasIndex(u => new { u.UserId, u.ListId }).IsUnique();
             modelBuilder.Entity<UserList>().HasIndex(u => u.CreatedDate);
             modelBuilder.Entity<UserList>().HasIndex(u => u.UpdatedDate);
             #endregion
