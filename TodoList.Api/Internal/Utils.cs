@@ -46,7 +46,7 @@ namespace TodoList.Api.Internal
                 string[] decodedCredentials = Encoding.ASCII.GetString(Convert.FromBase64String(authorizationToken.ToString().Replace("Basic ", ""))).Split(new[] { ':' });
 
                 var encodePassword = EncodePassword(decodedCredentials[1]);
-                var user = db.User.Where(u => u.UserName == decodedCredentials[0] && u.Password == encodePassword).FirstOrDefault();
+                var user = db.User.Where(u => u.UserName == decodedCredentials[0] && u.Password == encodePassword && u.Status == 1).FirstOrDefault();
                 if (user == null)
                     return false;
                 else

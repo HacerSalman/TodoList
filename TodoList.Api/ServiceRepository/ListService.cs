@@ -17,7 +17,9 @@ namespace TodoList.Api.ServiceRepository
             var list = from ul in db.UserList
                     join l in db.List
                     on ul.ListId equals l.Id
-                    where ul.UserId == userId
+                    where ul.UserId == userId &&
+                    ul.Status == 1 &&
+                    l.Status == 1
                     select l;
 
             response.List = list.ToList();

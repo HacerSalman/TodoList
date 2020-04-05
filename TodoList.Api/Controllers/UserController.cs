@@ -122,7 +122,10 @@ namespace TodoList.Api.Controllers
                         return NotFound("The user not found!");
                     }
 
-                    db.User.Remove(user);
+                    //Delete user
+                    user.Status = 0;
+                    user.UpdatedDate = Utils.GetUnixTimeNow();
+                    user.ModifierBy = user.UserName;
                     db.SaveChanges();
                     return Ok("The user deleted!");
                 }

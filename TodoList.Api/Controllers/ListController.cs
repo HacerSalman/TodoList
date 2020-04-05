@@ -127,7 +127,6 @@ namespace TodoList.Api.Controllers
                     currentList.EndsAt = list.EndsAt != null ? list.EndsAt : currentList.EndsAt;
                     currentList.Priority = list.Priority != null ? list.Priority : currentList.Priority;
                     currentList.StartsAt = list.StartsAt != null ? list.StartsAt : currentList.StartsAt;
-                    currentList.Status = list.Status != null ? list.Status : currentList.Status;
                     currentList.Title = !string.IsNullOrEmpty(list.Title) ? list.Title : currentList.Title;
                     currentList.Type = list.Type != null ? list.Type : currentList.Type;
                     db.SaveChanges();
@@ -279,16 +278,24 @@ namespace TodoList.Api.Controllers
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
                     //Check user list
-                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == listId);
+                    var userList = db.UserList.Where(ul => ul.UserId == user.Id && ul.ListId == listId).FirstOrDefault();
                     if (userList == null)
                         return Unauthorized("Unauthorized!");
+
+                    //Delete user list
+                    userList.Status = 0;
+                    userList.UpdatedDate = Utils.GetUnixTimeNow();
+                    userList.ModifierBy = user.UserName;
 
                     //Check the list
                     var currentList = db.List.Where(l => l.Id == listId).FirstOrDefault();
                     if (currentList == null)
                         return NotFound("The list not found!");
 
-                    db.List.Remove(currentList);
+                    //Delete current list
+                    currentList.Status = 0;
+                    currentList.UpdatedDate = Utils.GetUnixTimeNow();
+                    currentList.ModifierBy = user.UserName;
 
                     db.SaveChanges();
 
