@@ -71,25 +71,40 @@ namespace TodoList.Api.Controllers
                 var user = db.User.Where(u => u.UserName == signUpUser.UserName.Trim()).FirstOrDefault();
                 if(user != null)
                 {
-                    return StatusCode(409, "The username is already using");
+                    if(user.Status == 1)
+                        return StatusCode(409, "The username is already using");
+                    else
+                    {
+                        user.Status = 1;
+                        user.FullName = signUpUser.UserName;
+                        user.ModifierBy = signUpUser.UserName;
+                        user.UpdatedDate = Utils.GetUnixTimeNow();
+                        user.Password = Utils.EncodePassword(signUpUser.Password);
+                        db.SaveChanges();
+                        return Ok(user);
+                    }
+
                 }
-
-                //Create new user
-                var newUser = new User()
+                else
                 {
-                    CreatedDate = Utils.GetUnixTimeNow(),
-                    FullName = signUpUser.UserName,
-                    ModifierBy = signUpUser.UserName,
-                    OwnerBy = signUpUser.FullName,
-                    Password = Utils.EncodePassword(signUpUser.Password),
-                    Status = 1,
-                    UpdatedDate = Utils.GetUnixTimeNow(),
-                    UserName = signUpUser.UserName
-                };
+                    //Create new user
+                    var newUser = new User()
+                    {
+                        CreatedDate = Utils.GetUnixTimeNow(),
+                        FullName = signUpUser.FullName,
+                        ModifierBy = signUpUser.UserName,
+                        OwnerBy = signUpUser.UserName,
+                        Password = Utils.EncodePassword(signUpUser.Password),
+                        Status = 1,
+                        UpdatedDate = Utils.GetUnixTimeNow(),
+                        UserName = signUpUser.UserName
+                    };
 
-                db.User.Add(newUser);
-                db.SaveChanges();
-                return Ok(newUser);
+                    db.User.Add(newUser);
+                    db.SaveChanges();
+                    return Ok(newUser);
+                }
+                
             }
             catch (Exception ex)
             {
