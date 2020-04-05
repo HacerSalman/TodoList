@@ -26,9 +26,7 @@ namespace TodoList.Api.Controllers
         ///Get user list type
         /// </summary>  
         [ProducesResponseType(typeof(UserListTypeResponse), 200)]
-        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public ActionResult GetUserListType()
         {
@@ -40,7 +38,23 @@ namespace TodoList.Api.Controllers
                 HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
                 if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
                 {
-                    return Ok();//ListService.GetUserList(db, user.Id));
+                    //Get user type list
+                   var type =  
+                    from ut in db.UserListType
+                    join lt in db.ListType
+                    on ut.ListTypeId equals lt.Id
+                    where ut.UserId == user.Id &&
+                    ut.Status == 1 &&
+                    lt.Status == 1
+                    select lt;
+
+                    var response = new UserListTypeResponse()
+                    {
+                        List = type.ToList(),
+                        UserId = user.Id
+                    };
+
+                    return Ok(response);
                 }
                 else
                     return Unauthorized("Unauthorized!");

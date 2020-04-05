@@ -96,6 +96,7 @@ namespace TodoList.Model.Context
         public DbSet<List> List { get; set; }
         public DbSet<ListType> ListType { get; set; }
         public DbSet<UserList> UserList { get; set; }
+        public DbSet<UserListType> UserListType { get; set; }
         #endregion DbSets   
     }
 }
