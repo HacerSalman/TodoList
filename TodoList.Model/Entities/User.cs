@@ -15,15 +15,15 @@ namespace TodoList.Model.Entities
         public long Id { get; set; }
 
         [Column("user_name")]
-        [Required, StringLength(80)]
+        [Required(ErrorMessage = "Please provide user name", AllowEmptyStrings = false), StringLength(80)]
         public string UserName { get; set; }
 
         [Column("full_name")]
-        [Required, StringLength(80)]
+        [Required(ErrorMessage = "Please provide full name", AllowEmptyStrings = false), StringLength(80)]
         public string FullName { get; set; }
 
         [Column("password")]
-        [Required, StringLength(80)]
+        [Required(ErrorMessage = "Please provide password", AllowEmptyStrings = false), StringLength(80)]
         [JsonIgnore]
         public string Password { get; set; }
     }

@@ -11,7 +11,7 @@ using TodoList.Model.ResponseModels;
 
 namespace TodoList.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class ListTypeController : ControllerBase
     {
@@ -209,6 +209,11 @@ namespace TodoList.Api.Controllers
                     var currentListType = db.ListType.Find(typeId);
                     if (currentListType == null)
                         return NotFound("The list type not found!");
+
+                    //Check list type in active list
+                    var activeList = db.List.Where(l => l.Type == currentListType.Id && l.Status == 1).ToList();
+                    if (activeList.Count > 0)
+                        return StatusCode(414, "This list type using for active list. Firstly, delete the list and then try delete the list type.");
 
                     //Delete current list
                     currentListType.Status = 0;

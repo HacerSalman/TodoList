@@ -12,7 +12,7 @@ namespace TodoList.Api.ServiceRepository
     {
         public static UserListResponse GetUserList(TodoListDBContext db, long userId)
         {
-            UserListResponse response = null;         
+            UserListResponse response = new UserListResponse();    
 
             var list = from ul in db.UserList
                     join l in db.List

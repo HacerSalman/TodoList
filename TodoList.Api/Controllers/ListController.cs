@@ -126,9 +126,9 @@ namespace TodoList.Api.Controllers
                     currentList.Description = !string.IsNullOrEmpty(list.Description) ? list.Description : currentList.Description;
                     currentList.EndsAt = list.EndsAt != null ? list.EndsAt : currentList.EndsAt;
                     currentList.Priority = list.Priority != null ? list.Priority : currentList.Priority;
-                    currentList.StartsAt = list.StartsAt != null ? list.StartsAt : currentList.StartsAt;
+                    currentList.StartsAt = list.StartsAt != 0 ? list.StartsAt : currentList.StartsAt;
                     currentList.Title = !string.IsNullOrEmpty(list.Title) ? list.Title : currentList.Title;
-                    currentList.Type = list.Type != null ? list.Type : currentList.Type;
+                    currentList.Type = list.Type != 0 ? list.Type : currentList.Type;
                     db.SaveChanges();
 
                     return Ok(currentList);
@@ -239,9 +239,14 @@ namespace TodoList.Api.Controllers
                     if (currentList == null)
                         return NotFound("The list not found!");
 
+                    //Get list type
+                    var listType = db.ListType.FirstOrDefault(l => l.Id == typeId && l.Status == 1);
+                    if (listType == null)
+                        return NotFound("The list type not found!");
+
                     currentList.ModifierBy = user.UserName;
                     currentList.UpdatedDate = Utils.GetUnixTimeNow();
-                    currentList.Type = typeId;
+                    currentList.Type = listType.Id;
 
                     db.SaveChanges();
 
