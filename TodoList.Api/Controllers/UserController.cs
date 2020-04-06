@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using TodoList.Api.Internal;
 using TodoList.Model.Context;
 using TodoList.Model.Entities;
+using TodoList.Model.Enum;
 using TodoList.Model.RequestModels;
 
 namespace TodoList.Api.Controllers
@@ -71,11 +72,11 @@ namespace TodoList.Api.Controllers
                 var user = db.User.FirstOrDefault(u => u.UserName == signUpUser.UserName.Trim());
                 if(user != null)
                 {
-                    if(user.Status == 1)
+                    if(user.Status == (byte)StatusType.Active)
                         return StatusCode(409, "The username is already using");
                     else
                     {
-                        user.Status = 1;
+                        user.Status = (byte)StatusType.Active;
                         user.FullName = signUpUser.UserName;
                         user.ModifierBy = signUpUser.UserName;
                         user.UpdatedDate = Utils.GetUnixTimeNow();
@@ -95,7 +96,7 @@ namespace TodoList.Api.Controllers
                         ModifierBy = signUpUser.UserName,
                         OwnerBy = signUpUser.UserName,
                         Password = Utils.EncodePassword(signUpUser.Password),
-                        Status = 1,
+                        Status = (byte)StatusType.Active,
                         UpdatedDate = Utils.GetUnixTimeNow(),
                         UserName = signUpUser.UserName
                     };
@@ -138,7 +139,7 @@ namespace TodoList.Api.Controllers
                     }
 
                     //Delete user
-                    user.Status = 0;
+                    user.Status = (byte)StatusType.Passive;
                     user.UpdatedDate = Utils.GetUnixTimeNow();
                     user.ModifierBy = user.UserName;
                     db.SaveChanges();

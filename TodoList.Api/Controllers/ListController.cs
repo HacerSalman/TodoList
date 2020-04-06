@@ -8,6 +8,7 @@ using TodoList.Api.Internal;
 using TodoList.Api.ServiceRepository;
 using TodoList.Model.Context;
 using TodoList.Model.Entities;
+using TodoList.Model.Enum;
 using TodoList.Model.ResponseModels;
 
 namespace TodoList.Api.Controllers
@@ -57,7 +58,7 @@ namespace TodoList.Api.Controllers
                             OwnerBy = user.UserName,
                             Priority = list.Priority,
                             StartsAt = list.StartsAt,
-                            Status = 1,
+                            Status = (byte)StatusType.Active,
                             Title = list.Title,
                             Type = list.Type,
                             UpdatedDate = Utils.GetUnixTimeNow()
@@ -71,7 +72,7 @@ namespace TodoList.Api.Controllers
                             ListId = newList.Id,
                             ModifierBy = user.UserName,
                             OwnerBy = user.OwnerBy,
-                            Status = 1,
+                            Status = (byte)StatusType.Active,
                             UpdatedDate = Utils.GetUnixTimeNow(),
                             CreatedDate = Utils.GetUnixTimeNow(),
                             UserId = user.Id
@@ -174,7 +175,7 @@ namespace TodoList.Api.Controllers
                             OwnerBy = user.UserName,
                             Priority = list.Priority,
                             StartsAt = list.StartsAt,
-                            Status = 1,
+                            Status = (byte)StatusType.Active,
                             Title = list.Title,
                             Type = list.Type,
                             UpdatedDate = Utils.GetUnixTimeNow()
@@ -188,7 +189,7 @@ namespace TodoList.Api.Controllers
                             ListId = newList.Id,
                             ModifierBy = user.UserName,
                             OwnerBy = user.OwnerBy,
-                            Status = 1,
+                            Status = (byte)StatusType.Active,
                             UpdatedDate = Utils.GetUnixTimeNow(),
                             CreatedDate = Utils.GetUnixTimeNow(),
                             UserId = user.Id
@@ -240,7 +241,7 @@ namespace TodoList.Api.Controllers
                         return NotFound("The list not found!");
 
                     //Get list type
-                    var listType = db.ListType.FirstOrDefault(l => l.Id == typeId && l.Status == 1);
+                    var listType = db.ListType.FirstOrDefault(l => l.Id == typeId && l.Status == (byte)StatusType.Active);
                     if (listType == null)
                         return NotFound("The list type not found!");
 
@@ -298,7 +299,7 @@ namespace TodoList.Api.Controllers
                         return NotFound("The list not found!");
 
                     //Delete current list
-                    currentList.Status = 0;
+                    currentList.Status = (byte)StatusType.Passive;
                     currentList.UpdatedDate = Utils.GetUnixTimeNow();
                     currentList.ModifierBy = user.UserName;
 

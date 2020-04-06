@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using TodoList.Api.Internal;
 using TodoList.Model.Context;
 using TodoList.Model.Entities;
+using TodoList.Model.Enum;
 using TodoList.Model.ResponseModels;
 
 namespace TodoList.Api.Controllers
@@ -44,8 +45,8 @@ namespace TodoList.Api.Controllers
                     join lt in db.ListType
                     on ut.ListTypeId equals lt.Id
                     where ut.UserId == user.Id &&
-                    ut.Status == 1 &&
-                    lt.Status == 1
+                    ut.Status == (byte)StatusType.Active &&
+                    lt.Status == (byte)StatusType.Active
                     select lt;
 
                     var response = new UserListTypeResponse()
@@ -97,7 +98,7 @@ namespace TodoList.Api.Controllers
                             Description = listType.Description,                 
                             ModifierBy = user.UserName,
                             OwnerBy = user.UserName,
-                            Status = 1,
+                            Status = (byte)StatusType.Active,
                             UpdatedDate = Utils.GetUnixTimeNow(),
                             Name = listType.Name
                         };
@@ -110,7 +111,7 @@ namespace TodoList.Api.Controllers
                             ListTypeId = newListType.Id,
                             ModifierBy = user.UserName,
                             OwnerBy = user.OwnerBy,
-                            Status = 1,
+                            Status = (byte)StatusType.Active,
                             UpdatedDate = Utils.GetUnixTimeNow(),
                             CreatedDate = Utils.GetUnixTimeNow(),
                             UserId = user.Id
@@ -201,7 +202,7 @@ namespace TodoList.Api.Controllers
                         return Unauthorized("Unauthorized!");
 
                     //Delete user list
-                    userListType.Status = 0;
+                    userListType.Status = (byte)StatusType.Passive;
                     userListType.UpdatedDate = Utils.GetUnixTimeNow();
                     userListType.ModifierBy = user.UserName;
 
@@ -211,12 +212,12 @@ namespace TodoList.Api.Controllers
                         return NotFound("The list type not found!");
 
                     //Check list type in active list
-                    var activeList = db.List.Where(l => l.Type == currentListType.Id && l.Status == 1).ToList();
+                    var activeList = db.List.Where(l => l.Type == currentListType.Id && l.Status == (byte)StatusType.Active).ToList();
                     if (activeList.Count > 0)
                         return StatusCode(414, "This list type using for active list. Firstly, delete the list and then try delete the list type.");
 
                     //Delete current list
-                    currentListType.Status = 0;
+                    currentListType.Status = (byte)StatusType.Passive;
                     currentListType.UpdatedDate = Utils.GetUnixTimeNow();
                     currentListType.ModifierBy = user.UserName;
 

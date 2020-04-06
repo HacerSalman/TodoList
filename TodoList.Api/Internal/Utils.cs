@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TodoList.Model.Context;
 using TodoList.Model.Entities;
+using TodoList.Model.Enum;
 
 namespace TodoList.Api.Internal
 {
@@ -46,7 +47,7 @@ namespace TodoList.Api.Internal
                 string[] decodedCredentials = Encoding.ASCII.GetString(Convert.FromBase64String(authorizationToken.ToString().Replace("Basic ", ""))).Split(new[] { ':' });
 
                 var encodePassword = EncodePassword(decodedCredentials[1]);
-                var user = db.User.FirstOrDefault(u => u.UserName == decodedCredentials[0] && u.Password == encodePassword && u.Status == 1);
+                var user = db.User.FirstOrDefault(u => u.UserName == decodedCredentials[0] && u.Password == encodePassword && u.Status == (byte)StatusType.Active);
                 if (user == null)
                     return false;
                 else
