@@ -11,6 +11,7 @@ using TodoList.Model.Context;
 using TodoList.Model.Entities;
 using TodoList.Model.Enum;
 using TodoList.Model.RequestModels;
+using TodoList.Model.ResponseModels;
 
 namespace TodoList.Api.Controllers
 {
@@ -28,21 +29,34 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Login
         /// </summary>  
-        [ProducesResponseType(typeof(User),200)]
+        [ProducesResponseType(typeof(UserResponse),200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(500)]
-        public ActionResult Login()
+        public ActionResult Login(string username, string password)
         {
+            UserResponse response = new UserResponse();
             try
             {
-                User user = null;
-                //Check Basic Authentication
-                Microsoft.Extensions.Primitives.StringValues authorizationToken;
-                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken,ref user))
-                    return Ok(user);
+                var encodePassword = Utils.EncodePassword(password.Trim());
+                var user = db.User.FirstOrDefault(u => u.UserName == username.Trim() && u.Password == encodePassword && u.Status == (byte)StatusType.Active);
+                if (user == null)
+                {
+                    response.Message = "Username or password incorrect!";
+                    return Unauthorized(response);
+                }                 
                 else
-                    return Unauthorized("Username or password incorrect!");
+                {
+                    response = new UserResponse()
+                    {
+                        CreatedDate = user.CreatedDate,
+                        FullName = user.FullName,
+                        Status = user.Status,
+                        Token = ClaimPrincipal.GenerateToken(user.UserName),
+                        UserId = user.Id,
+                        UserName = user.UserName
+                    };
+                    return Ok(response);
+                }             
             }
             catch (Exception ex)
             {
@@ -118,35 +132,34 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Delete the user
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(BaseResponse),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [Authorize()]
         public ActionResult DeleteUser()
         {
+            BaseResponse response = new BaseResponse();
             try
             {
-                User user = null;
-                //Check Basic Authentication
-                Microsoft.Extensions.Primitives.StringValues authorizationToken;
-                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken,ref user))
-                {
-                    if (user == null)
-                    {
-                        return NotFound("The user not found!");
-                    }
+                var token = new ClaimPrincipal(HttpContext.User);
+                User user = db.User.FirstOrDefault(u => u.UserName == token.NameIdentifier);
 
-                    //Delete user
-                    user.Status = (byte)StatusType.Passive;
-                    user.UpdatedDate = Utils.GetUnixTimeNow();
-                    user.ModifierBy = user.UserName;
-                    db.SaveChanges();
-                    return Ok("The user deleted!");
+                if (user == null)
+                {
+                    response.Message = "The user not found!";
+                    return NotFound(response);
                 }
-                else
-                    return Unauthorized("Unauthorized!");
+
+                //Delete user
+                user.Status = (byte)StatusType.Passive;
+                user.UpdatedDate = Utils.GetUnixTimeNow();
+                user.ModifierBy = user.UserName;
+                db.SaveChanges();
+
+                response.Message = "The user deleted!";
+                return Ok(response);             
             }
             catch (Exception ex)
             {
@@ -161,43 +174,59 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Update the user
         /// </summary>  
-        [ProducesResponseType(200)]
+        [ProducesResponseType(typeof(UserResponse),200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [Authorize()]
         public ActionResult UpdateUser([FromBody] UpdateUserRequest request)
         {
             try
             {
-                User user = null;
+                UserResponse response = new UserResponse();
+                var token = new ClaimPrincipal(HttpContext.User);
+
                 //Check request body object
                 if (request == null)
                 {
-                    return BadRequest("Request bosy can not be empty!");
+                    response.Message = "Request body can not be empty!";
+                    return BadRequest(response);
                 }
 
-                //Check Basic Authentication
-                Microsoft.Extensions.Primitives.StringValues authorizationToken;
-                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken,ref user))
+                //Check authorization
+                if (token.NameIdentifier != request.Username)
                 {
-                    if (user == null)
-                    {
-                        return NotFound("The user not found!");
-                    }
-
-                    user.ModifierBy = user.UserName;
-                    user.UpdatedDate = Utils.GetUnixTimeNow();
-                    user.FullName = !string.IsNullOrEmpty(request.FullName) ? request.FullName : user.FullName;
-                    user.Password = !string.IsNullOrEmpty(request.Password) ? Utils.EncodePassword(request.Password) : user.Password;
-                
-                    db.SaveChanges();
-                    return Ok("The user updated!");
+                    response.Message = "Request body can not be empty!";
+                    return Unauthorized(response);
                 }
-                else
-                    return Unauthorized("Unauthorized!");
-            }
+
+                User user = db.User.FirstOrDefault(u => u.UserName == token.NameIdentifier);
+                if (user == null)
+                {
+                    response.Message = "The user not found!";
+                    return NotFound(response);
+                }
+
+                user.ModifierBy = user.UserName;
+                user.UpdatedDate = Utils.GetUnixTimeNow();
+                user.FullName = !string.IsNullOrEmpty(request.FullName) ? request.FullName : user.FullName;
+                user.Password = !string.IsNullOrEmpty(request.Password) ? Utils.EncodePassword(request.Password) : user.Password;
+                db.SaveChanges();
+
+                response = new UserResponse()
+                {
+                    CreatedDate = user.CreatedDate,
+                    FullName = user.FullName,
+                    Message = "The user updated!",
+                    Status = user.Status,
+                    UserId = user.Id,
+                    UserName = user.UserName
+                };
+
+                return Ok(response);
+
+            }                          
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);

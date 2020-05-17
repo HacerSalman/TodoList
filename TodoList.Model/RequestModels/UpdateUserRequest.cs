@@ -14,5 +14,8 @@ namespace TodoList.Model.RequestModels
 
         [JsonPropertyName("password")]
         public string Password { get; set; }
+
+        [JsonPropertyName("user_name")]
+        public string Username { get; set; }
     }
 }
