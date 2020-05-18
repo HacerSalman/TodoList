@@ -138,18 +138,22 @@ namespace TodoList.Api.Controllers
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         [Authorize()]
-        public ActionResult DeleteUser()
+        public ActionResult DeleteUser(long userId)
         {
             BaseResponse response = new BaseResponse();
             try
             {
                 var token = new ClaimPrincipal(HttpContext.User);
                 User user = db.User.FirstOrDefault(u => u.UserName == token.NameIdentifier);
-
                 if (user == null)
                 {
                     response.Message = "The user not found!";
                     return NotFound(response);
+                }
+                if(user.Id != userId)
+                {
+                    response.Message = "Unauthorized";
+                    return Unauthorized(response);
                 }
 
                 //Delete user
@@ -167,7 +171,6 @@ namespace TodoList.Api.Controllers
                 return StatusCode(500, ex.Message);
             }
             
-
         }
 
         [HttpPut]
@@ -237,29 +240,32 @@ namespace TodoList.Api.Controllers
         /// <summary>
         /// Get the user
         /// </summary>  
-        [ProducesResponseType(typeof(User),200)]
+        [ProducesResponseType(typeof(UserResponse),200)]
         [ProducesResponseType(401)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
+        [Authorize()]
         public ActionResult GetUser()
         {
             try
             {
-                User user = null;
-                //Check Basic Authentication
-                Microsoft.Extensions.Primitives.StringValues authorizationToken;
-                HttpContext.Request.Headers.TryGetValue("Authorization", out authorizationToken);
-                if (Utils.CheckBasicAuth(db, authorizationToken, ref user))
+                var token = new ClaimPrincipal(HttpContext.User);
+                UserResponse response = new UserResponse();
+                User user = db.User.FirstOrDefault(u => u.UserName == token.NameIdentifier);
+                if (user == null)
                 {
-                    if (user == null)
-                    {
-                        return NotFound("The user not found!");
-                    }
-
-                    return Ok(user);
+                    response.Message = "The user not found!";
+                    return NotFound(response);
                 }
-                else
-                    return Unauthorized("Unauthorized!");
+                response = new UserResponse()
+                {
+                    CreatedDate = user.CreatedDate,
+                    FullName = user.FullName,
+                    Status = user.Status,
+                    UserId = user.Id,
+                    UserName = user.UserName
+                };
+                return Ok(response);
             }
             catch (Exception ex)
             {

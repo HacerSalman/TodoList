@@ -7,7 +7,7 @@ using TodoList.Model.Entities;
 
 namespace TodoList.Model.ResponseModels
 {
-    public class UserListResponse
+    public class UserListResponse:BaseResponse
     {
         [JsonPropertyName("list")]
         public List<List> List { get; set; }

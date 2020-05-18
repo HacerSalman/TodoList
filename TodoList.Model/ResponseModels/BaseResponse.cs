@@ -8,6 +8,11 @@ namespace TodoList.Model.ResponseModels
 {
     public class BaseResponse
     {
+        public BaseResponse()
+        {
+            Message = "";
+        }
+
         [JsonPropertyName("message")]
         public string Message { get; set; }
     }

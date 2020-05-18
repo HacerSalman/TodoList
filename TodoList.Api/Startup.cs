@@ -100,10 +100,7 @@ namespace TodoListApp
 
             // Add framework services.
             services.AddMvc();
-
-            // https://github.com/aspnet/Hosting/issues/793
-            // the IHttpContextAccessor service is not registered by default.
-            // the clientId/clientIp resolvers use it.
+     
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // configuration (resolvers, counter key builders)
