@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace TodoList.Model.Entities
@@ -34,5 +35,9 @@ namespace TodoList.Model.Entities
 
         [Column("priority")]
         public byte? Priority { get; set; }
+
+        [JsonPropertyName("type_name")]
+        [NotMapped]
+        public string TypeName { get; set; }
     }
 }
